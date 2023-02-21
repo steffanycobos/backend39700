@@ -12,10 +12,12 @@ class ProductManager {
     //Obtener productos
     try {
       const products = await fs.promises.readFile(this.#path,'utf-8');
+      console.log(JSON.parse(products))
       return JSON.parse(products);
     } catch (e) {
-      return 'error!';
+      return [];
     }
+  
   }
   async addProducts(title, description, price, thumbnail, code, stock) {
     //Agregar producto sin repetir el code

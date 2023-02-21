@@ -4,11 +4,13 @@ import ProductManager from "./productManager.js";
 const app = express();
 let manager = new ProductManager("./dataproductos.json");
 app.get("/", (req, res) => {
-
   res.send("<h1>Hola!</h1>");
 });
+
 app.get("/products",async  (req, res) => {
-  res.send(manager.getProducts());
+  const product= await manager.getProducts()
+  console.log(product)
+  res.send(product);
 });
 
 app.get("/products/:id", async (req, res) => {
