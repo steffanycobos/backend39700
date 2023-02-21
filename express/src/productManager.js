@@ -1,6 +1,8 @@
-import fs from "fs";
-import productos from "./data.js";
+import  fs from "fs";
+
+
 class ProductManager {
+  #path=""
   constructor(path) {
     this.path = path;
   }
@@ -9,10 +11,10 @@ class ProductManager {
   async getProducts() {
     //Obtener productos
     try {
-      const prod = await fs.promises.readFile(this.path, "utf-8");
-      return JSON.parse(prod);
+      const products = await fs.promises.readFile(this.#path,'utf-8');
+      return JSON.parse(products);
     } catch (e) {
-      return [];
+      return 'error!';
     }
   }
   async addProducts(title, description, price, thumbnail, code, stock) {
@@ -29,16 +31,16 @@ class ProductManager {
     const prod = await this.getProducts();
     let cd = prod.find((x) => x.code === code);
     if (!cd) {
-      fs.promises.writeFile(this.path, JSON.stringify([...prod, newProduct]));
+      fs.promises.writeFile(path, JSON.stringify([...prod, newProduct]));
       this.#accumulator += 1;
     } else {
       throw new Error(`El código ${code} ya esta registrado.`);
     }
   }
-  getProductById(id) {
+ async  getProductById(id) {
     // Producto por ID
-    const prod = this.getProducts();
-    let element = productos.find((x) => x.id === id);
+    const prod =  await this.getProducts()
+    let element = prod.find((x) => x.id === id);
     if (element) {
       //fs.promises.appendFile(`Producto con ID ${id}: ${JSON.stringify(element)}`)
       return element;
@@ -104,7 +106,6 @@ class ProductManager {
     }
   }
 }
-const manager = new ProductManager("./product.json");
 
 
 export default ProductManager;
