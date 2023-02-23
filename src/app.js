@@ -27,13 +27,8 @@ app.get("/products", async (req, res) => {
 
 app.get("/products/:id", async (req, res) => {
   let num = parseInt(req.params.id);
-  res.send(manager.getProductById(num));
-});
-
-app.get("/products", async (req, res) => {
-  const product = await manager.getProducts();
-  let { limit } = req.query;
-  res.send(product.filter((x) => x.id < limit));
+  const products = await manager.getProducts(num);
+  res.send(products);
 });
 
 app.listen(8080, () => console.log(`Server listening to port 8080`));

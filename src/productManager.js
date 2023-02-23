@@ -2,9 +2,9 @@ import  fs from "fs";
 
 
 class ProductManager {
-  #path=""
+  #path;
   constructor(path) {
-    this.path = path;
+    this.#path = path;
   }
   #accumulator = 0;
 
@@ -12,7 +12,7 @@ class ProductManager {
     //Obtener productos
     try {
       const products = await fs.promises.readFile(this.#path,'utf-8');
-      console.log(JSON.parse(products))
+      console.log(JSON.parse(products),'hola')
       return JSON.parse(products);
     } catch (e) {
       return [];
