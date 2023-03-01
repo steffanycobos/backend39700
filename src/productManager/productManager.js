@@ -1,47 +1,52 @@
-import  fs from "fs";
+import fs from "fs";
+
 
 
 class ProductManager {
   #path;
+  #accumulator = 0;
   constructor(path) {
     this.#path = path;
   }
-  #accumulator = 0;
 
+  
   async getProducts() {
     //Obtener productos
+    console.log(this.#path)
     try {
       const products = await fs.promises.readFile(this.#path,'utf-8');
-      console.log(JSON.parse(products),'hola')
       return JSON.parse(products);
     } catch (e) {
       return [];
     }
   
   }
-  async addProducts(title, description, price, thumbnail, code, stock) {
+  
+  async addProducts(title, description, price, code, stock,category) {
     //Agregar producto sin repetir el code
     const newProduct = {
-      id: this.#accumulator,
+      id: data.length,
+      status:true,
       title,
       description,
       price,
-      thumbnail,
+      thumbnail:[],
       code,
       stock,
+      category
     };
     const prod = await this.getProducts();
     let cd = prod.find((x) => x.code === code);
     if (!cd) {
-      fs.promises.writeFile(path, JSON.stringify([...prod, newProduct]));
-      this.#accumulator += 1;
+      fs.promises.writeFile(this.#path, JSON.stringify([...prod, newProduct]));
+      this.#accumulator=this.#accumulator+1;
     } else {
       throw new Error(`El código ${code} ya esta registrado.`);
     }
   }
- async  getProductById(id) {
+  async getProductById(id) {
     // Producto por ID
-    const prod =  await this.getProducts()
+    const prod = await this.getProducts()
     let element = prod.find((x) => x.id === id);
     if (element) {
       //fs.promises.appendFile(`Producto con ID ${id}: ${JSON.stringify(element)}`)
@@ -51,12 +56,14 @@ class ProductManager {
     }
   }
 
-  async updateProduct(id, title, description, price, thumbnail, code, stock) {
+  async updateProduct(id, title, description, price, code, stock,category) {
     // Actualiza producto
     let actual = [];
     const prod = await this.getProducts();
     actual = prod.find((x) => x.id === id);
-
+if(!actual){
+  throw new Error(`El id: ${id} no existe.`)
+}
     if (title === undefined) {
       title = prod[id - 1].title;
     } else {
@@ -72,11 +79,7 @@ class ProductManager {
     } else {
       actual.price = price;
     }
-    if (thumbnail === undefined) {
-      thumbnail = prod[id - 1].thumbnail;
-    } else {
-      actual.thumbnail = thumbnail;
-    }
+    
     if (code === undefined) {
       code = prod[id - 1].code;
     } else {
@@ -87,10 +90,16 @@ class ProductManager {
     } else {
       actual.stock = stock;
     }
+    if (category === undefined ) {
+      category = prod[id - 1].stock;
+    } else {
+      actual.category = category;
+    }
     fs.promises.appendFile(
-      this.path,
+      this.#path,
       `Listado de productos actualizados: ${JSON.stringify(prod)}`
-    );
+      );
+      return (prod)
   }
 
   async deleteProduct(id) {
@@ -103,6 +112,7 @@ class ProductManager {
         "./products.json",
         `Productos actuales:  ${JSON.stringify(rest)}`
       );
+      return rest
     } else {
       throw new Error(` No se encuentra ningún objeto con id: ${id}`);
     }
