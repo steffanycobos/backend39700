@@ -1,10 +1,10 @@
 import fs from "fs";
+import __dirname from "../utils.js";
 
 
 
 class ProductManager {
   #path;
-  #accumulator = 0;
   constructor(path) {
     this.#path = path;
   }
@@ -24,22 +24,25 @@ class ProductManager {
   
   async addProducts(title, description, price, code, stock,category) {
     //Agregar producto sin repetir el code
+    const prod = await this.getProducts();
     const newProduct = {
-      id: data.length,
+      id: prod.length,
       status:true,
       title,
       description,
       price,
-      thumbnail:[],
       code,
+      thumbnail:[],
       stock,
       category
     };
-    const prod = await this.getProducts();
-    let cd = prod.find((x) => x.code === code);
-    if (!cd) {
-      fs.promises.writeFile(this.#path, JSON.stringify([...prod, newProduct]));
-      this.#accumulator=this.#accumulator+1;
+    let cd = prod.find((x) => x.code ===code);
+  
+    if (!cd) { 
+      await  fs.promises.writeFile(this.#path, JSON.stringify([...prod, newProduct]))
+      console.log("Producto agregado!")
+      return   ([...prod, newProduct])
+      
     } else {
       throw new Error(`El código ${code} ya esta registrado.`);
     }
@@ -95,9 +98,9 @@ if(!actual){
     } else {
       actual.category = category;
     }
-    fs.promises.appendFile(
+    fs.promises.writeFile(
       this.#path,
-      `Listado de productos actualizados: ${JSON.stringify(prod)}`
+      JSON.stringify(prod)
       );
       return (prod)
   }
@@ -108,9 +111,8 @@ if(!actual){
     let checkId = prod.find((x) => x.id === id);
     if (checkId) {
       let rest = prod.filter((x) => x.id !== id);
-      fs.promises.appendFile(
-        "./products.json",
-        `Productos actuales:  ${JSON.stringify(rest)}`
+      fs.promises.writeFile(
+        JSON.stringify(rest)
       );
       return rest
     } else {
